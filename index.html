@@ -6,7 +6,7 @@
     <title>Orange Earning App 🍊</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <style>
         :root {
@@ -14,200 +14,572 @@
             --primary-color: #E74C3C; --secondary-color: #F39C12;
             --background-light: #FDFEFE; --surface-light: #FFFFFF; --text-primary-light: #2C3E50; --text-secondary-light: #808B96; --border-light: #EAEDED;
             --background-dark: #1B2631; --surface-dark: #283747; --text-primary-dark: #FDFEFE; --text-secondary-dark: #ABB2B9; --border-dark: #566573;
-            --success: #27AE60; --danger: #C0392B; --pending: #F39C12; --info: #3498DB;
+            --success: #27AE60; --danger: #C0392B; --pending: #F39C12; --info: #3498DB; --warning: #F1C40F;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-success: linear-gradient(135deg, var(--success), #2ECC71);
+            --gradient-info: linear-gradient(135deg, var(--info), #5DADE2);
+            --shadow: 0 4px 12px rgba(0,0,0,0.1); --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
         }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-family); transition: background-color 0.3s, color 0.3s; -webkit-font-smoothing: antialiased; }
+        body { font-family: var(--font-family); transition: all 0.3s ease; -webkit-font-smoothing: antialiased; line-height: 1.6; }
         body.light-theme { background-color: var(--background-light); color: var(--text-primary-light); }
         body.dark-theme { background-color: var(--background-dark); color: var(--text-primary-dark); }
-        #app { max-width: 500px; margin: 0 auto; padding-bottom: 80px; }
+        #app { max-width: 500px; margin: 0 auto; padding-bottom: 80px; min-height: 100vh; }
         .page { display: none; padding: 15px; }
         .page.active { display: block; animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* Enhanced Profile Header */
         .profile-header {
-            padding: 25px 15px; border-bottom: 1px solid;
+            padding: 30px 20px; border-bottom: 1px solid;
             display: flex; flex-direction: column; align-items: center; text-align: center;
+            background: var(--gradient-primary); color: white; position: relative; overflow: hidden;
         }
-        .light-theme .profile-header { background-color: var(--surface-light); border-bottom-color: var(--border-light); }
-        .dark-theme .profile-header { background-color: var(--surface-dark); border-bottom-color: var(--border-dark); }
-        #user-photo { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--primary-color); object-fit: cover; margin-bottom: 10px; }
-        #user-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; }
-        #user-balance-container { font-size: 1rem; font-weight: 500; }
-        #user-balance { font-size: 1.1rem; font-weight: 700; color: var(--primary-color); }
+        .profile-header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: rgba(255,255,255,0.1); transform: rotate(45deg); }
+        .light-theme .profile-header { border-bottom-color: var(--border-light); }
+        .dark-theme .profile-header { border-bottom-color: var(--border-dark); }
+        #user-photo { width: 90px; height: 90px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.8); object-fit: cover; margin-bottom: 15px; position: relative; z-index: 2; box-shadow: var(--shadow); }
+        #user-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        #user-balance-container { font-size: 1.1rem; font-weight: 500; position: relative; z-index: 2; }
+        #user-balance { font-size: 1.3rem; font-weight: 800; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .stat-card { padding: 15px; border-radius: 12px; text-align: center; border: 1px solid; }
-        .light-theme .stat-card { background-color: var(--surface-light); border-color: var(--border-light); }
-        .dark-theme .stat-card { background-color: var(--surface-dark); border-color: var(--border-dark); }
-        .stat-card h3 { font-size: 0.85rem; font-weight: 500; margin-bottom: 8px; text-transform: uppercase; }
-        .light-theme .stat-card h3 { color: var(--text-secondary-light); } .dark-theme .stat-card h3 { color: var(--text-secondary-dark); }
-        .stat-card p { font-size: 1.4rem; font-weight: 600; color: var(--primary-color); }
+        /* Enhanced Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+        .stat-card { padding: 20px; border-radius: 16px; text-align: center; border: none; box-shadow: var(--shadow); transition: all 0.3s ease; cursor: pointer; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary); }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .light-theme .stat-card { background-color: var(--surface-light); }
+        .dark-theme .stat-card { background-color: var(--surface-dark); }
+        .stat-card h3 { font-size: 0.8rem; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .light-theme .stat-card h3 { color: var(--text-secondary-light); } 
+        .dark-theme .stat-card h3 { color: var(--text-secondary-dark); }
+        .stat-card p { font-size: 1.6rem; font-weight: 700; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 5px 0; }
+        .stat-card .stat-icon { font-size: 1.8rem; margin-bottom: 10px; opacity: 0.8; }
+
+        /* Enhanced Cards */
+        .chart-container, .earning-wallet-card, .premium-card { 
+            padding: 25px; border-radius: 20px; margin-top: 20px; border: none; 
+            box-shadow: var(--shadow); transition: all 0.3s ease; position: relative;
+        }
+        .chart-container:hover, .earning-wallet-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .light-theme .chart-container, .light-theme .earning-wallet-card, .light-theme .premium-card { 
+            background-color: var(--surface-light); 
+        }
+        .dark-theme .chart-container, .dark-theme .earning-wallet-card, .dark-theme .premium-card { 
+            background-color: var(--surface-dark); 
+        }
         
-        .chart-container, .earning-wallet-card { padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid; }
-        .light-theme .chart-container, .light-theme .earning-wallet-card { background-color: var(--surface-light); border-color: var(--border-light); }
-        .dark-theme .chart-container, .dark-theme .earning-wallet-card { background-color: var(--surface-dark); border-color: var(--border-dark); }
-        .chart { display: flex; justify-content: space-around; align-items: flex-end; height: 150px; border-left: 1px solid; border-bottom: 1px solid; padding-top: 10px; }
-        .light-theme .chart { border-color: var(--border-light); } .dark-theme .chart { border-color: var(--border-dark); }
-        .bar { width: 12%; background: linear-gradient(to top, var(--primary-color), var(--secondary-color)); border-radius: 5px 5px 0 0; position: relative; cursor: pointer; }
-        .bar .tooltip { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: var(--secondary); color: white; padding: 3px 7px; border-radius: 5px; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+        /* Premium Card */
+        .premium-card { background: var(--gradient-primary); color: white; text-align: center; }
+        .premium-card h3 { font-size: 1.4rem; margin-bottom: 10px; font-weight: 700; }
+        .premium-card p { margin-bottom: 20px; opacity: 0.9; }
+        
+        /* Enhanced Chart */
+        .chart { display: flex; justify-content: space-around; align-items: flex-end; height: 160px; border-left: 1px solid; border-bottom: 1px solid; padding-top: 15px; position: relative; }
+        .light-theme .chart { border-color: var(--border-light); } 
+        .dark-theme .chart { border-color: var(--border-dark); }
+        .bar { width: 11%; background: var(--gradient-primary); border-radius: 8px 8px 0 0; position: relative; cursor: pointer; transition: all 0.3s ease; }
+        .bar:hover { transform: scaleY(1.05); filter: brightness(1.1); }
+        .bar .tooltip { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: var(--surface-dark); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 10; box-shadow: var(--shadow); }
         .bar:hover .tooltip { opacity: 1; }
-        .chart-labels { display: flex; justify-content: space-around; font-size: 0.75rem; margin-top: 5px; }
+        .chart-labels { display: flex; justify-content: space-around; font-size: 0.75rem; margin-top: 8px; font-weight: 500; }
 
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
-        .light-theme .history-item { background-color: var(--surface-light); border: 1px solid var(--border-light); }
-        .dark-theme .history-item { background-color: var(--surface-dark); border: 1px solid var(--border-dark); }
-        .history-details p { margin: 0; } .history-details p:first-child { font-weight: 600; }
-        .history-status { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: white; text-transform: capitalize; }
-        .status-completed { background-color: var(--success); } .status-pending { background-color: var(--pending); } .status-rejected { background-color: var(--danger); }
+        /* Enhanced History Items */
+        .history-item { 
+            display: flex; justify-content: space-between; align-items: center; padding: 18px; 
+            border-radius: 12px; margin-bottom: 12px; transition: all 0.3s ease; border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .history-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .light-theme .history-item { background-color: var(--surface-light); }
+        .dark-theme .history-item { background-color: var(--surface-dark); }
+        .history-details p { margin: 0; } 
+        .history-details p:first-child { font-weight: 600; font-size: 1rem; }
+        .history-details small { opacity: 0.7; font-size: 0.8rem; }
+        .history-status { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: white; text-transform: capitalize; letter-spacing: 0.5px; }
+        .status-completed { background: var(--gradient-success); } 
+        .status-pending { background: var(--gradient-primary); } 
+        .status-rejected { background: linear-gradient(135deg, var(--danger), #E74C3C); }
 
-        .progress-container { margin-bottom: 20px; }
-        .progress-info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; font-weight: 500; }
-        .progress-bar-bg { width: 100%; height: 10px; border-radius: 5px; }
+        /* Enhanced Progress Bars */
+        .progress-container { margin-bottom: 25px; }
+        .progress-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; font-weight: 600; }
+        .progress-bar-bg { width: 100%; height: 12px; border-radius: 10px; position: relative; overflow: hidden; }
         .light-theme .progress-bar-bg { background-color: var(--border-light); }
         .dark-theme .progress-bar-bg { background-color: var(--border-dark); }
-        .progress-bar-fg { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); transition: width 0.3s ease; }
+        .progress-bar-fg { height: 100%; border-radius: 10px; background: var(--gradient-primary); transition: width 0.5s ease; position: relative; }
+        .progress-bar-fg::after { content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
         
-        form input, form select, form textarea { transition: all 0.2s ease-in-out; border: 1px solid; }
-        .light-theme form input, .light-theme form select { border-color: var(--border-light); }
-        .dark-theme form input, .dark-theme form select { border-color: var(--border-dark); }
-        form input:focus, form select:focus, form textarea:focus { outline: none; border-color: var(--primary-color) !important; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2); }
+        /* Enhanced Forms */
+        form input, form select, form textarea { 
+            transition: all 0.3s ease-in-out; border: 2px solid; border-radius: 10px; 
+            padding: 12px 15px; font-size: 1rem; width: 100%;
+        }
+        .light-theme form input, .light-theme form select { 
+            border-color: var(--border-light); background: var(--surface-light); 
+        }
+        .dark-theme form input, .dark-theme form select { 
+            border-color: var(--border-dark); background: var(--surface-dark); color: var(--text-primary-dark);
+        }
+        form input:focus, form select:focus, form textarea:focus { 
+            outline: none; border-color: var(--primary-color) !important; 
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2); transform: scale(1.02);
+        }
 
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 10000; }
-        .popup-content { padding: 30px; border-radius: 15px; text-align: center; max-width: 80%; }
-        .light-theme .popup-content { background-color: var(--surface-light); } .dark-theme .popup-content { background-color: var(--surface-dark); }
-        .popup-content h2 { margin-bottom: 15px; color: var(--primary-color); } .popup-content p { margin-bottom: 20px; }
-        .popup-close-btn { padding: 10px 25px; border: none; border-radius: 8px; color: #fff; background-color: var(--primary-color); cursor: pointer; }
-        .popup-loader .spinner { width: 40px; height: 40px; border-radius: 50%; border: 4px solid; border-color: var(--primary-color) transparent; animation: spin 1s linear infinite; margin: 0 auto 15px;}
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Enhanced Popups */
+        .popup-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.7); display: none; justify-content: center; 
+            align-items: center; z-index: 10000; backdrop-filter: blur(5px);
+        }
+        .popup-content { 
+            padding: 35px; border-radius: 20px; text-align: center; 
+            max-width: 85%; width: 400px; box-shadow: var(--shadow-hover);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .light-theme .popup-content { background-color: var(--surface-light); } 
+        .dark-theme .popup-content { background-color: var(--surface-dark); }
+        .popup-content h2 { margin-bottom: 15px; color: var(--primary-color); font-size: 1.5rem; }
+        .popup-content p { margin-bottom: 25px; line-height: 1.6; }
+        .popup-close-btn { 
+            padding: 12px 30px; border: none; border-radius: 10px; color: #fff; 
+            background: var(--gradient-primary); cursor: pointer; font-weight: 600;
+            transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        .popup-close-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4); }
+        .popup-loader .spinner { width: 50px; height: 50px; border-radius: 50%; border: 4px solid; border-color: var(--primary-color) transparent; animation: spin 1s linear infinite; margin: 0 auto 20px;}
         
-        #app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .light-theme #app-loader { background-color: var(--background-light); } .dark-theme #app-loader { background-color: var(--background-dark); }
-        #app-loader .spinner { width: 50px; height: 50px; border-radius: 50%; border: 5px solid; border-color: var(--primary-color) transparent; animation: spin 1s linear infinite; }
-        #loading-progress { margin-top: 15px; font-size: 1.2rem; font-weight: 600; }
-        .light-theme #loading-progress { color: var(--text-primary-light); } .dark-theme #loading-progress { color: var(--text-primary-dark); }
+        /* Enhanced Loader */
+        #app-loader { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .light-theme #app-loader { background-color: rgba(253, 254, 254, 0.95); } 
+        .dark-theme #app-loader { background-color: rgba(27, 38, 49, 0.95); }
+        #app-loader .spinner { 
+            width: 60px; height: 60px; border-radius: 50%; border: 5px solid; 
+            border-color: var(--primary-color) transparent; animation: spin 1s linear infinite;
+            position: relative;
+        }
+        #app-loader .spinner::after { content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border: 3px solid transparent; border-top-color: var(--secondary-color); border-radius: 50%; animation: spin 1.5s linear infinite; }
+        #loading-progress { margin-top: 20px; font-size: 1.3rem; font-weight: 700; }
+        .light-theme #loading-progress { color: var(--text-primary-light); } 
+        .dark-theme #loading-progress { color: var(--text-primary-dark); }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid; z-index: 1000; }
-        .light-theme .bottom-nav { background-color: var(--surface-light); border-top-color: var(--border-light); }
-        .dark-theme .bottom-nav { background-color: var(--surface-dark); border-top-color: var(--border-dark); }
-        .nav-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-family: var(--font-family); font-size: 0.75rem; transition: color 0.2s; flex-grow: 1; }
-        .light-theme .nav-btn { color: var(--text-secondary-light); } .dark-theme .nav-btn { color: var(--text-secondary-dark); }
-        .nav-btn i { font-size: 1.5rem; margin-bottom: 4px; } .nav-btn.active { color: var(--primary-color); }
+        /* Enhanced Bottom Navigation */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; 
+            display: flex; justify-content: space-around; padding: 12px 0; 
+            border-top: 1px solid; backdrop-filter: blur(10px); z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .dark-theme .bottom-nav { background: rgba(39, 49, 61, 0.9); }
+        .light-theme .bottom-nav { border-top-color: var(--border-light); }
+        .dark-theme .bottom-nav { border-top-color: var(--border-dark); }
+        .nav-btn { 
+            background: none; border: none; cursor: pointer; display: flex; 
+            flex-direction: column; align-items: center; font-family: var(--font-family); 
+            font-size: 0.75rem; transition: all 0.3s ease; flex-grow: 1; padding: 8px 5px;
+            border-radius: 12px; margin: 0 5px; position: relative;
+        }
+        .light-theme .nav-btn { color: var(--text-secondary-light); } 
+        .dark-theme .nav-btn { color: var(--text-secondary-dark); }
+        .nav-btn i { font-size: 1.6rem; margin-bottom: 5px; transition: all 0.3s ease; }
+        .nav-btn.active { color: var(--primary-color); transform: translateY(-5px); }
+        .nav-btn.active i { transform: scale(1.1); filter: drop-shadow(0 4px 8px rgba(231, 76, 60, 0.3)); }
         
-        .task-container { padding: 20px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; }
-        .light-theme .task-container { background-color: var(--surface-light); border: 1px solid var(--border-light); }
-        .dark-theme .task-container { background-color: var(--surface-dark); border: 1px solid var(--border-dark); }
-        .task-icon-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
-        .task-info h3 { font-size: 1.1rem; font-weight: 600; } .task-info p { font-size: 0.85rem; }
-        .action-btn { padding: 10px 20px; font-size: 0.9rem; font-weight: 600; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); margin-left: auto; white-space: nowrap; }
-        .action-btn:disabled { background: #808B96; cursor: not-allowed; }
+        /* Enhanced Task Containers */
+        .task-container { 
+            padding: 22px; border-radius: 16px; margin-bottom: 18px; 
+            display: flex; align-items: center; gap: 18px; transition: all 0.3s ease;
+            box-shadow: var(--shadow); border: none; position: relative; overflow: hidden;
+        }
+        .task-container::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: var(--gradient-primary); }
+        .task-container:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .light-theme .task-container { background-color: var(--surface-light); }
+        .dark-theme .task-container { background-color: var(--surface-dark); }
+        .task-icon-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .task-info h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 5px; } 
+        .task-info p { font-size: 0.9rem; opacity: 0.8; }
+        .action-btn { 
+            padding: 12px 25px; font-size: 0.95rem; font-weight: 700; color: #fff; 
+            border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; 
+            background: var(--gradient-primary); margin-left: auto; white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        .action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4); }
+        .action-btn:active { transform: translateY(0); }
+        .action-btn:disabled { background: #95a5a6; cursor: not-allowed; box-shadow: none; transform: none; }
         
-        .leaderboard-toggle { display: flex; justify-content: space-around; margin-bottom: 15px; }
-        .toggle-btn { padding: 10px 20px; border: none; background: none; font-size: 1rem; cursor: pointer; }
-        .light-theme .toggle-btn { color: var(--text-secondary-light); } .dark-theme .toggle-btn { color: var(--text-secondary-dark); }
-        .toggle-btn.active { font-weight: 700; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+        /* Enhanced Leaderboard */
+        .leaderboard-toggle { display: flex; justify-content: space-around; margin-bottom: 20px; background: var(--surface-light); border-radius: 12px; padding: 5px; }
+        .dark-theme .leaderboard-toggle { background: var(--surface-dark); }
+        .toggle-btn { padding: 12px 20px; border: none; background: none; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; border-radius: 10px; font-weight: 500; flex: 1; }
+        .light-theme .toggle-btn { color: var(--text-secondary-light); } 
+        .dark-theme .toggle-btn { color: var(--text-secondary-dark); }
+        .toggle-btn.active { font-weight: 700; color: var(--primary-color); background: rgba(231, 76, 60, 0.1); box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2); }
         .leaderboard-list { list-style: none; }
-        .leaderboard-item { display: flex; align-items: center; padding: 10px; margin-bottom: 8px; border-radius: 8px; }
-        .light-theme .leaderboard-item { background-color: var(--surface-light); } .dark-theme .leaderboard-item { background-color: var(--surface-dark); }
-        .rank { font-size: 1.2rem; font-weight: 700; color: var(--primary-color); width: 40px; }
-        .leaderboard-item img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
-        .leaderboard-name { font-weight: 600; flex-grow: 1; } .leaderboard-score { font-weight: 600; color: var(--primary-color); }
+        .leaderboard-item { 
+            display: flex; align-items: center; padding: 15px; margin-bottom: 10px; 
+            border-radius: 12px; transition: all 0.3s ease; border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .leaderboard-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .light-theme .leaderboard-item { background-color: var(--surface-light); } 
+        .dark-theme .leaderboard-item { background-color: var(--surface-dark); }
+        .rank { font-size: 1.3rem; font-weight: 800; color: var(--primary-color); width: 45px; text-align: center; }
+        .leaderboard-item img { width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; object-fit: cover; border: 3px solid var(--primary-color); }
+        .leaderboard-name { font-weight: 600; flex-grow: 1; font-size: 1.05rem; } 
+        .leaderboard-score { font-weight: 700; color: var(--primary-color); font-size: 1.1rem; }
 
         /* New Enhanced Features Styles */
-        .history-tabs { display: flex; margin-bottom: 15px; border-bottom: 1px solid; overflow-x: auto; }
+        .history-tabs { 
+            display: flex; margin-bottom: 20px; border-bottom: 1px solid; 
+            overflow-x: auto; background: var(--surface-light); border-radius: 12px; padding: 5px;
+        }
+        .dark-theme .history-tabs { background: var(--surface-dark); }
         .light-theme .history-tabs { border-color: var(--border-light); }
         .dark-theme .history-tabs { border-color: var(--border-dark); }
-        .history-tab { padding: 10px 15px; background: none; border: none; cursor: pointer; font-weight: 500; white-space: nowrap; }
+        .history-tab { 
+            padding: 12px 18px; background: none; border: none; cursor: pointer; 
+            font-weight: 500; white-space: nowrap; transition: all 0.3s ease; border-radius: 8px;
+            flex: 1; text-align: center;
+        }
         .light-theme .history-tab { color: var(--text-secondary-light); }
         .dark-theme .history-tab { color: var(--text-secondary-dark); }
-        .history-tab.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+        .history-tab.active { 
+            color: var(--primary-color); background: rgba(231, 76, 60, 0.1); 
+            font-weight: 700; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+        }
         .history-section { display: none; }
-        .history-section.active { display: block; }
+        .history-section.active { display: block; animation: fadeIn 0.5s ease; }
         
-        .message-container { padding: 15px; border-radius: 10px; margin-bottom: 10px; }
-        .light-theme .message-container { background-color: var(--surface-light); border: 1px solid var(--border-light); }
-        .dark-theme .message-container { background-color: var(--surface-dark); border: 1px solid var(--border-dark); }
-        .message-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .message-title { font-weight: 600; color: var(--primary-color); }
-        .message-date { font-size: 0.8rem; color: var(--text-secondary-light); }
+        /* Message Styles */
+        .message-container { 
+            padding: 18px; border-radius: 12px; margin-bottom: 12px; 
+            transition: all 0.3s ease; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .message-container:hover { transform: translateX(3px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .light-theme .message-container { background-color: var(--surface-light); }
+        .dark-theme .message-container { background-color: var(--surface-dark); }
+        .message-header { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
+        .message-title { font-weight: 700; color: var(--primary-color); font-size: 1.1rem; }
+        .message-date { font-size: 0.8rem; color: var(--text-secondary-light); font-weight: 500; }
         .dark-theme .message-date { color: var(--text-secondary-dark); }
-        .message-content { font-size: 0.9rem; }
+        .message-content { font-size: 0.95rem; line-height: 1.5; }
         
+        /* Referral Styles */
         .referral-list { list-style: none; }
-        .referral-item { display: flex; align-items: center; padding: 10px; margin-bottom: 8px; border-radius: 8px; }
+        .referral-item { 
+            display: flex; align-items: center; padding: 15px; margin-bottom: 10px; 
+            border-radius: 12px; transition: all 0.3s ease; border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .referral-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
         .light-theme .referral-item { background-color: var(--surface-light); }
         .dark-theme .referral-item { background-color: var(--surface-dark); }
-        .referral-item img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
-        .referral-name { font-weight: 600; flex-grow: 1; }
-        .referral-status { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; }
-        .status-active { background-color: var(--success); color: white; }
-        .status-inactive { background-color: var(--danger); color: white; }
+        .referral-item img { width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; object-fit: cover; border: 2px solid var(--primary-color); }
+        .referral-name { font-weight: 600; flex-grow: 1; font-size: 1.05rem; }
+        .referral-status { font-size: 0.75rem; padding: 5px 10px; border-radius: 12px; font-weight: 700; }
+        .status-active { background: var(--gradient-success); color: white; }
+        .status-inactive { background: linear-gradient(135deg, var(--danger), #E74C3C); color: white; }
         
-        .settings-container { padding: 20px; border-radius: 12px; margin-bottom: 15px; }
-        .light-theme .settings-container { background-color: var(--surface-light); border: 1px solid var(--border-light); }
-        .dark-theme .settings-container { background-color: var(--surface-dark); border: 1px solid var(--border-dark); }
-        .setting-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .setting-label { font-weight: 500; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        /* Settings Styles */
+        .settings-container { 
+            padding: 25px; border-radius: 16px; margin-bottom: 20px; 
+            box-shadow: var(--shadow); border: none;
+        }
+        .light-theme .settings-container { background-color: var(--surface-light); }
+        .dark-theme .settings-container { background-color: var(--surface-dark); }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid; }
+        .light-theme .setting-item { border-color: var(--border-light); }
+        .dark-theme .setting-item { border-color: var(--border-dark); }
+        .setting-label { font-weight: 600; font-size: 1.05rem; }
+        .setting-description { font-size: 0.85rem; opacity: 0.7; margin-top: 5px; }
+        .switch { position: relative; display: inline-block; width: 54px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary-color); }
+        .slider { 
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
+            background-color: #ccc; transition: .4s; border-radius: 28px;
+        }
+        .slider:before { 
+            position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; 
+            background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider { background: var(--gradient-primary); }
         input:checked + .slider:before { transform: translateX(26px); }
         
-        .withdraw-method-icon { width: 30px; height: 30px; margin-right: 10px; object-fit: contain; }
-        .method-option { display: flex; align-items: center; padding: 10px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; }
-        .light-theme .method-option { background-color: var(--surface-light); border: 1px solid var(--border-light); }
-        .dark-theme .method-option { background-color: var(--surface-dark); border: 1px solid var(--border-dark); }
-        .method-option.selected { border-color: var(--primary-color); background-color: rgba(231, 76, 60, 0.1); }
+        /* Withdraw Method Styles */
+        .withdraw-method-icon { width: 35px; height: 35px; margin-right: 12px; object-fit: contain; border-radius: 8px; }
+        .method-option { 
+            display: flex; align-items: center; padding: 15px; border-radius: 12px; 
+            margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease; border: 2px solid;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .method-option:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .light-theme .method-option { background-color: var(--surface-light); border-color: var(--border-light); }
+        .dark-theme .method-option { background-color: var(--surface-dark); border-color: var(--border-dark); }
+        .method-option.selected { border-color: var(--primary-color); background-color: rgba(231, 76, 60, 0.1); box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2); }
         .method-info { flex-grow: 1; }
-        .method-name { font-weight: 600; }
-        .method-min { font-size: 0.8rem; color: var(--text-secondary-light); }
+        .method-name { font-weight: 700; font-size: 1.1rem; }
+        .method-min { font-size: 0.85rem; color: var(--text-secondary-light); font-weight: 500; }
         .dark-theme .method-min { color: var(--text-secondary-dark); }
         
-        .chat-container { height: 300px; border: 1px solid; border-radius: 10px; display: flex; flex-direction: column; margin-top: 15px; }
+        /* Chat Styles */
+        .chat-container { 
+            height: 350px; border: 1px solid; border-radius: 16px; 
+            display: flex; flex-direction: column; margin-top: 20px; overflow: hidden;
+            box-shadow: var(--shadow);
+        }
         .light-theme .chat-container { border-color: var(--border-light); }
         .dark-theme .chat-container { border-color: var(--border-dark); }
-        .chat-messages { flex-grow: 1; padding: 10px; overflow-y: auto; }
-        .chat-input-container { display: flex; padding: 10px; border-top: 1px solid; }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-input-container { display: flex; padding: 15px; border-top: 1px solid; background: var(--surface-light); }
+        .dark-theme .chat-input-container { background: var(--surface-dark); }
         .light-theme .chat-input-container { border-color: var(--border-light); }
         .dark-theme .chat-input-container { border-color: var(--border-dark); }
-        .chat-input { flex-grow: 1; padding: 8px; border: 1px solid; border-radius: 20px; margin-right: 10px; }
-        .light-theme .chat-input { border-color: var(--border-light); }
-        .dark-theme .chat-input { border-color: var(--border-dark); }
-        .chat-send-btn { padding: 8px 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 20px; cursor: pointer; }
+        .chat-input { 
+            flex-grow: 1; padding: 12px 18px; border: 2px solid; border-radius: 25px; 
+            margin-right: 12px; font-size: 1rem; transition: all 0.3s ease;
+        }
+        .light-theme .chat-input { border-color: var(--border-light); background: var(--surface-light); }
+        .dark-theme .chat-input { border-color: var(--border-dark); background: var(--surface-dark); color: var(--text-primary-dark); }
+        .chat-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2); }
+        .chat-send-btn { 
+            padding: 12px 20px; background: var(--gradient-primary); color: white; 
+            border: none; border-radius: 25px; cursor: pointer; font-weight: 600;
+            transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        .chat-send-btn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4); }
         
-        .ad-banner { width: 100%; height: 100px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); border-radius: 10px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 600; margin: 15px 0; }
+        /* Ad Banner */
+        .ad-banner { 
+            width: 100%; height: 110px; background: var(--gradient-primary); 
+            border-radius: 16px; display: flex; justify-content: center; align-items: center; 
+            color: white; font-weight: 700; margin: 20px 0; font-size: 1.2rem;
+            box-shadow: var(--shadow); position: relative; overflow: hidden;
+        }
+        .ad-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent); animation: shimmer 3s infinite; }
         
-        .notification-badge { position: absolute; top: -5px; right: -5px; background-color: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; display: flex; justify-content: center; align-items: center; }
+        /* Notification Badges */
+        .notification-badge { 
+            position: absolute; top: -5px; right: -5px; background: linear-gradient(135deg, var(--danger), #E74C3C); 
+            color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; 
+            display: flex; justify-content: center; align-items: center; font-weight: 700;
+            box-shadow: 0 2px 6px rgba(199, 0, 0, 0.4);
+        }
         .nav-btn { position: relative; }
         
-        .auto-ad-container { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; }
-        .light-theme .auto-ad-container { background-color: var(--surface-light); border: 1px solid var(--border-light); }
-        .dark-theme .auto-ad-container { background-color: var(--surface-dark); border: 1px solid var(--border-dark); }
-        .auto-ad-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .auto-ad-stats { font-size: 0.9rem; color: var(--text-secondary-light); }
+        /* Auto Ad System */
+        .auto-ad-container { 
+            margin-top: 25px; padding: 20px; border-radius: 16px; 
+            box-shadow: var(--shadow); border: none; transition: all 0.3s ease;
+        }
+        .auto-ad-container:hover { box-shadow: var(--shadow-hover); }
+        .light-theme .auto-ad-container { background-color: var(--surface-light); }
+        .dark-theme .auto-ad-container { background-color: var(--surface-dark); }
+        .auto-ad-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .auto-ad-stats { font-size: 0.95rem; color: var(--text-secondary-light); font-weight: 500; }
         .dark-theme .auto-ad-stats { color: var(--text-secondary-dark); }
+        
+        /* Achievement System */
+        .achievement-container { 
+            padding: 20px; border-radius: 16px; margin-bottom: 20px; 
+            box-shadow: var(--shadow); border: none; text-align: center;
+        }
+        .light-theme .achievement-container { background-color: var(--surface-light); }
+        .dark-theme .achievement-container { background-color: var(--surface-dark); }
+        .achievement-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .achievement-item { 
+            padding: 15px; border-radius: 12px; text-align: center; transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative; overflow: hidden;
+        }
+        .achievement-item.locked { opacity: 0.6; filter: grayscale(1); }
+        .achievement-item.unlocked::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary); }
+        .light-theme .achievement-item { background-color: var(--surface-light); }
+        .dark-theme .achievement-item { background-color: var(--surface-dark); }
+        .achievement-item:hover { transform: translateY(-5px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+        .achievement-icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .achievement-name { font-weight: 700; font-size: 1rem; margin-bottom: 5px; }
+        .achievement-desc { font-size: 0.8rem; opacity: 0.8; }
+        .achievement-reward { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); margin-top: 5px; }
+        
+        /* Daily Bonus */
+        .daily-bonus-container { 
+            padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center;
+            background: var(--gradient-info); color: white; box-shadow: var(--shadow);
+            position: relative; overflow: hidden;
+        }
+        .daily-bonus-container::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: rgba(255,255,255,0.1); transform: rotate(45deg); }
+        .daily-bonus-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; position: relative; z-index: 2; }
+        .daily-bonus-desc { margin-bottom: 20px; opacity: 0.9; position: relative; z-index: 2; }
+        .daily-bonus-wheel { width: 200px; height: 200px; margin: 0 auto 20px; position: relative; z-index: 2; }
+        
+        /* Streak System */
+        .streak-container { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 20px; border-radius: 16px; margin-bottom: 20px;
+            box-shadow: var(--shadow); border: none;
+        }
+        .light-theme .streak-container { background-color: var(--surface-light); }
+        .dark-theme .streak-container { background-color: var(--surface-dark); }
+        .streak-info { flex-grow: 1; }
+        .streak-count { font-size: 2rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .streak-label { font-size: 1rem; font-weight: 600; opacity: 0.8; }
+        .streak-days { display: flex; gap: 8px; }
+        .streak-day { 
+            width: 35px; height: 35px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; font-weight: 700;
+            border: 2px solid;
+        }
+        .streak-day.active { background: var(--gradient-primary); color: white; border-color: var(--primary-color); }
+        .light-theme .streak-day { border-color: var(--border-light); }
+        .dark-theme .streak-day { border-color: var(--border-dark); }
+        
+        /* VIP System */
+        .vip-container { 
+            padding: 25px; border-radius: 16px; margin-bottom: 20px; 
+            background: linear-gradient(135deg, #FFD700, #FFA500); color: #7D6608;
+            box-shadow: var(--shadow); text-align: center; position: relative; overflow: hidden;
+        }
+        .vip-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 3s infinite; }
+        .vip-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; position: relative; z-index: 2; }
+        .vip-desc { margin-bottom: 20px; font-weight: 600; position: relative; z-index: 2; }
+        .vip-benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; position: relative; z-index: 2; }
+        .vip-benefit { padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.3); font-weight: 600; }
+        
+        /* Quick Actions */
+        .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+        .quick-action { 
+            padding: 15px 10px; border-radius: 12px; text-align: center; 
+            transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow);
+            border: none;
+        }
+        .quick-action:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .light-theme .quick-action { background-color: var(--surface-light); }
+        .dark-theme .quick-action { background-color: var(--surface-dark); }
+        .quick-action i { font-size: 1.8rem; margin-bottom: 8px; color: var(--primary-color); }
+        .quick-action span { font-size: 0.8rem; font-weight: 600; display: block; }
+        
+        /* Enhanced Responsive Design */
+        @media (max-width: 400px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+            .vip-benefits { grid-template-columns: 1fr; }
+            .achievement-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Animation for new features */
+        @keyframes pulse { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.05); } 
+            100% { transform: scale(1); } 
+        }
+        .pulse { animation: pulse 2s infinite; }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary-color); }
     </style>
 </head>
 <body>
-    <div id="app-loader"><div class="spinner"></div><p id="loading-progress">0%</p></div>
-    <div id="popup" class="popup-overlay"><div class="popup-content"><div id="popup-body"></div></div></div>
+    <div id="app-loader">
+        <div class="spinner"></div>
+        <p id="loading-progress">0%</p>
+    </div>
+    
+    <div id="popup" class="popup-overlay">
+        <div class="popup-content">
+            <div id="popup-body"></div>
+        </div>
+    </div>
+    
     <div id="app" style="display: none;">
+        <!-- Enhanced Profile Header -->
         <header class="profile-header">
-            <img id="user-photo" src="https://via.placeholder.com/80" alt="User">
+            <img id="user-photo" src="https://via.placeholder.com/90" alt="User">
             <h1 id="user-name">Loading...</h1>
             <div id="user-balance-container">Main Balance: <span id="user-balance">0.00</span> <span id="currency-symbol">TK</span></div>
         </header>
+        
         <main id="main-content">
+            <!-- Home Page -->
             <div id="home-page" class="page active">
-                <div class="stats-grid">
-                    <div class="stat-card"><h3>Today's Ads</h3><p id="daily-ads-watched">0 / 0</p></div>
-                    <div class="stat-card"><h3>Total Referrals</h3><p id="referral-count">0</p></div>
-                    <div class="stat-card"><h3>Total Ads Watched</h3><p id="total-ads-watched">0</p></div>
-                    <div class="stat-card"><h3>Total Income</h3><p id="total-earned">0.00 <span class="currency-symbol">TK</span></p></div>
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="quick-action" data-action="watch-ad">
+                        <i class="fas fa-play-circle"></i>
+                        <span>Watch Ad</span>
+                    </div>
+                    <div class="quick-action" data-action="referral">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Referral</span>
+                    </div>
+                    <div class="quick-action" data-action="withdraw">
+                        <i class="fas fa-wallet"></i>
+                        <span>Withdraw</span>
+                    </div>
+                    <div class="quick-action" data-action="tasks">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </div>
                 </div>
                 
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-ad"></i></div>
+                        <h3>Today's Ads</h3>
+                        <p id="daily-ads-watched">0 / 0</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <h3>Total Referrals</h3>
+                        <p id="referral-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-eye"></i></div>
+                        <h3>Total Ads Watched</h3>
+                        <p id="total-ads-watched">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                        <h3>Total Income</h3>
+                        <p id="total-earned">0.00 <span class="currency-symbol">TK</span></p>
+                    </div>
+                </div>
+                
+                <!-- Daily Bonus -->
+                <div class="daily-bonus-container">
+                    <h3 class="daily-bonus-title">Daily Login Bonus!</h3>
+                    <p class="daily-bonus-desc">Claim your daily reward and increase your streak</p>
+                    <button id="daily-bonus-btn" class="action-btn pulse">Claim 10 TK Bonus</button>
+                </div>
+                
+                <!-- Streak System -->
+                <div class="streak-container">
+                    <div class="streak-info">
+                        <div class="streak-count" id="streak-count">0 Days</div>
+                        <div class="streak-label">Current Streak</div>
+                    </div>
+                    <div class="streak-days">
+                        <div class="streak-day active">M</div>
+                        <div class="streak-day">T</div>
+                        <div class="streak-day">W</div>
+                        <div class="streak-day">T</div>
+                        <div class="streak-day">F</div>
+                        <div class="streak-day">S</div>
+                        <div class="streak-day">S</div>
+                    </div>
+                </div>
+                
+                <!-- Auto Ad System -->
                 <div class="auto-ad-container">
                     <div class="auto-ad-toggle">
                         <span>Auto Watch Ads</span>
@@ -219,30 +591,66 @@
                     <div class="auto-ad-stats" id="auto-ad-stats">Auto ads will watch ads automatically</div>
                 </div>
                 
+                <!-- Earnings Graph -->
                 <div id="earnings-graph-container" class="chart-container">
                     <h3>Last 7 Days Earnings</h3>
                     <div id="earnings-chart" class="chart"></div>
                     <div id="earnings-chart-labels" class="chart-labels"></div>
                 </div>
+                
+                <!-- VIP System -->
+                <div class="vip-container">
+                    <h3 class="vip-title">VIP Membership</h3>
+                    <p class="vip-desc">Unlock exclusive benefits and earn more!</p>
+                    <div class="vip-benefits">
+                        <div class="vip-benefit">2x Ad Rewards</div>
+                        <div class="vip-benefit">No Ad Limits</div>
+                        <div class="vip-benefit">Priority Support</div>
+                        <div class="vip-benefit">Daily Bonus</div>
+                    </div>
+                    <button id="vip-upgrade-btn" class="action-btn">Upgrade to VIP - 500 TK/month</button>
+                </div>
+                
+                <!-- Dynamic Links -->
                 <div id="dynamic-links-container" style="margin-top: 20px;"></div>
+                
+                <!-- Ad Banner -->
                 <div id="ad-banner-container"></div>
             </div>
             
+            <!-- Tasks Page -->
             <div id="tasks-page" class="page">
+                <!-- Earning Wallet -->
                 <div class="earning-wallet-card">
                     <h3>Earning Wallet</h3>
-                    <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary-color); margin: 10px 0;">
+                    <p style="font-size: 2rem; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0;">
                         <span id="earning-wallet-balance">0.00</span> <span class="currency-symbol">TK</span>
                     </p>
                     <small>Minimum 100 <span class="currency-symbol">TK</span> to move to main balance.</small>
-                    <button id="move-to-balance-btn" class="action-btn" style="width:100%; margin-top: 15px;" disabled>Move to Main Balance</button>
+                    <button id="move-to-balance-btn" class="action-btn" style="width:100%; margin-top: 20px;" disabled>Move to Main Balance</button>
                 </div>
-                <div id="ad-progress-container" class="progress-container" style="margin-top:20px;"></div>
+                
+                <!-- Ad Progress -->
+                <div id="ad-progress-container" class="progress-container" style="margin-top:25px;"></div>
+                
+                <!-- Ad Task -->
                 <div id="ad-task-container"></div>
-                <h2>Bonus Tasks</h2>
+                
+                <!-- Achievement System -->
+                <div class="achievement-container">
+                    <h3>Achievements</h3>
+                    <p>Complete tasks to unlock achievements and earn rewards</p>
+                    <div class="achievement-grid" id="achievement-grid">
+                        <!-- Achievements will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Bonus Tasks -->
+                <h2 style="margin: 25px 0 15px 0;">Bonus Tasks</h2>
                 <div id="dynamic-tasks-container"></div>
             </div>
             
+            <!-- Leaderboard Page -->
             <div id="leaderboard-page" class="page">
                 <h2>Leaderboard</h2>
                 <div class="leaderboard-toggle">
@@ -250,15 +658,26 @@
                     <button class="toggle-btn" data-board="earning">Top Earners</button>
                     <button class="toggle-btn" data-board="weekly">Weekly Top</button>
                 </div>
-                <div id="referral-board"><ul class="leaderboard-list" id="referral-leaderboard-list"></ul></div>
-                <div id="earning-board" style="display: none;"><ul class="leaderboard-list" id="earning-leaderboard-list"></ul></div>
-                <div id="weekly-board" style="display: none;"><ul class="leaderboard-list" id="weekly-leaderboard-list"></ul></div>
+                <div id="referral-board">
+                    <ul class="leaderboard-list" id="referral-leaderboard-list"></ul>
+                </div>
+                <div id="earning-board" style="display: none;">
+                    <ul class="leaderboard-list" id="earning-leaderboard-list"></ul>
+                </div>
+                <div id="weekly-board" style="display: none;">
+                    <ul class="leaderboard-list" id="weekly-leaderboard-list"></ul>
+                </div>
             </div>
             
+            <!-- Profile Page -->
             <div id="profile-page" class="page">
+                <!-- Referral Section -->
                 <div id="referral-section"></div>
+                
+                <!-- Withdraw Section -->
                 <div id="withdraw-section"></div>
                 
+                <!-- History Tabs -->
                 <div class="history-tabs">
                     <button class="history-tab active" data-history="withdrawal">Withdrawal</button>
                     <button class="history-tab" data-history="ads">Ad History</button>
@@ -267,21 +686,25 @@
                     <button class="history-tab" data-history="settings">Settings</button>
                 </div>
                 
+                <!-- Withdrawal History -->
                 <div id="withdrawal-history-section" class="history-section active">
                     <h2>Withdrawal History</h2>
                     <div id="withdrawal-history-list"></div>
                 </div>
                 
+                <!-- Ad History -->
                 <div id="ad-history-section" class="history-section">
                     <h2>Ad Watch History</h2>
                     <div id="ad-history-list"></div>
                 </div>
                 
+                <!-- Referral History -->
                 <div id="referral-history-section" class="history-section">
                     <h2>Referral History</h2>
                     <div id="referral-history-list"></div>
                 </div>
                 
+                <!-- Messages Section -->
                 <div id="messages-section" class="history-section">
                     <h2>Messages</h2>
                     <div id="messages-list"></div>
@@ -294,39 +717,60 @@
                     </div>
                 </div>
                 
+                <!-- Settings Section -->
                 <div id="settings-section" class="history-section">
                     <div class="settings-container">
                         <h2>Settings</h2>
+                        
                         <div class="setting-item">
-                            <span class="setting-label">Dark Mode</span>
+                            <div>
+                                <div class="setting-label">Dark Mode</div>
+                                <div class="setting-description">Switch between light and dark theme</div>
+                            </div>
                             <label class="switch">
                                 <input type="checkbox" id="dark-mode-toggle">
                                 <span class="slider"></span>
                             </label>
                         </div>
+                        
                         <div class="setting-item">
-                            <span class="setting-label">Notifications</span>
+                            <div>
+                                <div class="setting-label">Notifications</div>
+                                <div class="setting-description">Receive app notifications</div>
+                            </div>
                             <label class="switch">
                                 <input type="checkbox" id="notifications-toggle" checked>
                                 <span class="slider"></span>
                             </label>
                         </div>
+                        
                         <div class="setting-item">
-                            <span class="setting-label">Auto Play Ads</span>
+                            <div>
+                                <div class="setting-label">Auto Play Ads</div>
+                                <div class="setting-description">Automatically watch ads when available</div>
+                            </div>
                             <label class="switch">
                                 <input type="checkbox" id="autoplay-toggle">
                                 <span class="slider"></span>
                             </label>
                         </div>
+                        
                         <div class="setting-item">
-                            <span class="setting-label">Sound Effects</span>
+                            <div>
+                                <div class="setting-label">Sound Effects</div>
+                                <div class="setting-description">Play sounds for actions</div>
+                            </div>
                             <label class="switch">
                                 <input type="checkbox" id="sound-toggle" checked>
                                 <span class="slider"></span>
                             </label>
                         </div>
+                        
                         <div class="setting-item">
-                            <span class="setting-label">Vibration</span>
+                            <div>
+                                <div class="setting-label">Vibration</div>
+                                <div class="setting-description">Haptic feedback for actions</div>
+                            </div>
                             <label class="switch">
                                 <input type="checkbox" id="vibration-toggle" checked>
                                 <span class="slider"></span>
@@ -334,18 +778,23 @@
                         </div>
                     </div>
                     
+                    <!-- Account Information -->
                     <div class="task-container" style="flex-direction: column; align-items: stretch;">
                         <h3>Account Information</h3>
-                        <div style="margin: 10px 0;">
+                        <div style="margin: 15px 0;">
                             <p><strong>User ID:</strong> <span id="user-id-display">Loading...</span></p>
                             <p><strong>Joined:</strong> <span id="join-date">Loading...</span></p>
                             <p><strong>Last Active:</strong> <span id="last-active">Loading...</span></p>
+                            <p><strong>Member Since:</strong> <span id="member-since">Loading...</span></p>
                         </div>
                         <button id="refresh-data-btn" class="action-btn" style="width: 100%;">Refresh Data</button>
+                        <button id="logout-btn" class="action-btn" style="width: 100%; margin-top: 10px; background: var(--gradient-info);">Logout</button>
                     </div>
                 </div>
             </div>
         </main>
+        
+        <!-- Enhanced Bottom Navigation -->
         <nav class="bottom-nav">
             <button class="nav-btn active" data-page="home-page">
                 <i class="fas fa-home"></i><span>Home</span>
@@ -371,7 +820,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const tg = window.Telegram.WebApp;
         
-        // Replace with your Firebase configuration
+        // Firebase Configuration - Replace with your config
         const firebaseConfig = {
             apiKey: "AIzaSyBc7_h600GIlYkiyCS_ShjGfT8nIuZzvE8",
             authDomain: "telegram-mini-app-bb5a2.firebaseapp.com",
@@ -394,6 +843,9 @@
         let chatMessages = [];
         let autoAdInterval = null;
         let unreadMessagesCount = 0;
+        let userAchievements = [];
+        let loginStreak = 0;
+        let lastLoginDate = null;
 
         const popup = document.getElementById('popup');
         const popupBody = document.getElementById('popup-body');
@@ -451,7 +903,7 @@
                 await loadUserData(db);
                 updateProgress(60);
 
-                // Load all data in parallel for better performance
+                // Load all data in parallel
                 const [
                     referralBoardSnap, 
                     earningBoardSnap, 
@@ -463,7 +915,9 @@
                     loadTransactionHistory(db),
                     loadAdHistory(db),
                     loadReferralHistory(db),
-                    loadUserMessages(db)
+                    loadUserMessages(db),
+                    loadAchievements(db),
+                    checkDailyBonus(db)
                 ]);
                 updateProgress(80);
 
@@ -498,7 +952,7 @@
                     
                     // Show welcome message for new users
                     if (appConfig.welcomeMessage && !userState.welcomed) {
-                        showPopup(`<h2>Welcome!</h2><p>${appConfig.welcomeMessage}</p><button class="popup-close-btn">Continue</button>`);
+                        showPopup(`<h2>Welcome!</h2><p>${appConfig.welcomeMessage}</p><button class="popup-close-btn">Get Started</button>`);
                         db.ref(`users/${tgUser.id}/welcomed`).set(true);
                     }
                 }, 500);
@@ -506,7 +960,6 @@
             } catch (error) { 
                 console.error("Initialization failed:", error); 
                 
-                // Show specific error messages
                 if (error.code === 'PERMISSION_DENIED') {
                     tg.showAlert("Database permission denied. Please contact admin.");
                 } else {
@@ -530,7 +983,7 @@
                     firstName: tgUser.first_name || '', 
                     lastName: tgUser.last_name || '', 
                     username: tgUser.username || '', 
-                    photoUrl: tgUser.photo_url || 'https://via.placeholder.com/80', 
+                    photoUrl: tgUser.photo_url || 'https://via.placeholder.com/90', 
                     balance: 0, 
                     referrals: 0, 
                     referredBy: referralId, 
@@ -550,7 +1003,12 @@
                         autoPlay: false,
                         sound: true,
                         vibration: true
-                    }
+                    },
+                    achievements: {},
+                    loginStreak: 0,
+                    lastLoginDate: null,
+                    isVIP: false,
+                    vipExpiry: null
                 };
                 
                 await userRef.set(userData);
@@ -570,7 +1028,7 @@
                     });
                 }
             } else {
-                // Update last active timestamp for existing user
+                // Update last active for existing user
                 await userRef.update({ 
                     lastActive: firebase.database.ServerValue.TIMESTAMP 
                 });
@@ -646,6 +1104,51 @@
             updateMessageBadges();
         };
         
+        const loadAchievements = async (db) => {
+            userAchievements = [];
+            const achievementsSnapshot = await db.ref('achievements').once('value');
+            const userAchievementsSnapshot = await db.ref(`users/${tgUser.id}/achievements`).once('value');
+            const userAchievementsData = userAchievementsSnapshot.val() || {};
+            
+            achievementsSnapshot.forEach(childSnap => {
+                const achievement = childSnap.val();
+                if (achievement) {
+                    achievement.unlocked = userAchievementsData[achievement.id] || false;
+                    userAchievements.push(achievement);
+                }
+            });
+        };
+        
+        const checkDailyBonus = async (db) => {
+            const today = new Date().toISOString().slice(0, 10);
+            const lastBonusDate = localStorage.getItem(`lastBonusDate_${tgUser.id}`);
+            
+            if (lastBonusDate !== today) {
+                // User can claim daily bonus
+                document.getElementById('daily-bonus-btn').disabled = false;
+            } else {
+                document.getElementById('daily-bonus-btn').disabled = true;
+                document.getElementById('daily-bonus-btn').textContent = 'Already Claimed Today';
+            }
+            
+            // Update login streak
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().slice(0, 10);
+            
+            if (lastBonusDate === yesterdayStr) {
+                // Consecutive login
+                loginStreak = (userState.loginStreak || 0) + 1;
+                await db.ref(`users/${tgUser.id}/loginStreak`).set(loginStreak);
+            } else if (lastBonusDate !== today) {
+                // Broken streak
+                loginStreak = 1;
+                await db.ref(`users/${tgUser.id}/loginStreak`).set(loginStreak);
+            } else {
+                loginStreak = userState.loginStreak || 0;
+            }
+        };
+        
         const setupRealTimeListeners = (db) => {
             // Real-time balance updates
             db.ref(`users/${tgUser.id}/balance`).on('value', (snapshot) => {
@@ -695,14 +1198,16 @@
         
         const renderUI = () => {
             // Update user info
-            document.getElementById('user-photo').src = userState.photoUrl || 'https://via.placeholder.com/80';
+            document.getElementById('user-photo').src = userState.photoUrl || 'https://via.placeholder.com/90';
             document.getElementById('user-name').textContent = `${userState.firstName || ''} ${userState.lastName || ''}`.trim() || 'User';
             document.getElementById('user-balance').textContent = (userState.balance || 0).toFixed(2);
             document.getElementById('user-id-display').textContent = userState.id || 'N/A';
             
-            // Update join date and last active
+            // Update dates
             if (userState.joinDate) {
-                document.getElementById('join-date').textContent = new Date(userState.joinDate).toLocaleDateString();
+                const joinDate = new Date(userState.joinDate);
+                document.getElementById('join-date').textContent = joinDate.toLocaleDateString();
+                document.getElementById('member-since').textContent = `${Math.floor((Date.now() - joinDate.getTime()) / (1000 * 60 * 60 * 24))} days`;
             }
             if (userState.lastActive) {
                 document.getElementById('last-active').textContent = new Date(userState.lastActive).toLocaleString();
@@ -715,8 +1220,9 @@
             document.getElementById('total-earned').textContent = (userState.totalEarned || 0).toFixed(2);
             document.getElementById('earning-wallet-balance').textContent = earningWalletBalance.toFixed(2);
             document.getElementById('move-to-balance-btn').disabled = earningWalletBalance < 100;
+            document.getElementById('streak-count').textContent = `${loginStreak} Days`;
             
-            // Update currency symbol everywhere
+            // Update currency
             const currencySymbol = appConfig.currency || 'TK';
             document.querySelectorAll('.currency-symbol').forEach(el => {
                 el.textContent = currencySymbol;
@@ -734,6 +1240,8 @@
             renderAdBanner();
             renderSettings();
             renderAutoAdSection();
+            renderAchievements();
+            renderStreakDays();
         };
         
         const renderAdProgress = () => {
@@ -775,7 +1283,7 @@
             const maxEarning = Math.max(...earningsData, 1);
             
             earningsData.forEach((earning, index) => {
-                const height = Math.max((earning / maxEarning) * 100, 5); // Minimum 5% height
+                const height = Math.max((earning / maxEarning) * 100, 5);
                 const dateLabel = new Date(dates[index]).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
                 chartEl.innerHTML += `
                     <div class="bar" style="height: ${height}%;">
@@ -817,7 +1325,13 @@
                 await adFunction();
                 closePopup();
                 
-                const adValue = parseFloat(appConfig.adValue || 5);
+                let adValue = parseFloat(appConfig.adValue || 5);
+                
+                // VIP users get 2x rewards
+                if (userState.isVIP) {
+                    adValue *= 2;
+                }
+                
                 const db = firebase.database();
                 
                 // Update earning wallet
@@ -861,7 +1375,10 @@
                 const today = new Date().toISOString().slice(0, 10);
                 await db.ref(`userEarnings/${tgUser.id}/${today}`).set(firebase.database.ServerValue.increment(adValue));
 
-                // Haptic feedback and notification
+                // Check achievements
+                await checkAdAchievements(db);
+
+                // Haptic feedback
                 if (userState.settings?.vibration) {
                     tg.HapticFeedback.notificationOccurred('success');
                 }
@@ -956,7 +1473,7 @@
             
             listEl.innerHTML = userReferralHistory.map(user => `
                 <div class="referral-item">
-                    <img src="${user.photoUrl || 'https://via.placeholder.com/40'}" alt="User" onerror="this.src='https://via.placeholder.com/40'">
+                    <img src="${user.photoUrl || 'https://via.placeholder.com/45'}" alt="User" onerror="this.src='https://via.placeholder.com/45'">
                     <span class="referral-name">${user.name}</span>
                     <span class="referral-status ${user.status === 'active' ? 'status-active' : 'status-inactive'}">
                         ${user.status}
@@ -1017,7 +1534,7 @@
                 container.innerHTML = `
                     <div class="ad-banner">
                         <i class="fas fa-ad" style="margin-right: 10px;"></i>
-                        Advertisement
+                        Advertisement - Watch ads to earn more!
                     </div>
                 `;
             } else {
@@ -1036,6 +1553,36 @@
             }
         };
         
+        const renderAchievements = () => {
+            const container = document.getElementById('achievement-grid');
+            if (userAchievements.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--text-secondary-light);">No achievements available.</p>';
+                return;
+            }
+            
+            container.innerHTML = userAchievements.map(achievement => `
+                <div class="achievement-item ${achievement.unlocked ? 'unlocked' : 'locked'}">
+                    <div class="achievement-icon">${achievement.icon || '🏆'}</div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-desc">${achievement.description}</div>
+                    <div class="achievement-reward">+${achievement.reward} ${appConfig.currency || 'TK'}</div>
+                </div>
+            `).join('');
+        };
+        
+        const renderStreakDays = () => {
+            const streakDays = document.querySelectorAll('.streak-day');
+            const today = new Date().getDay();
+            
+            streakDays.forEach((day, index) => {
+                if (index < today) {
+                    day.classList.add('active');
+                } else {
+                    day.classList.remove('active');
+                }
+            });
+        };
+        
         const startAutoAds = () => {
             if (autoAdInterval) {
                 clearInterval(autoAdInterval);
@@ -1047,7 +1594,7 @@
                     (!userState.breakUntil || Date.now() > userState.breakUntil)) {
                     handleWatchAd();
                 }
-            }, 60000); // Check every minute
+            }, 60000);
             
             renderAutoAdSection();
         };
@@ -1060,6 +1607,34 @@
             }
         };
         
+        const checkAdAchievements = async (db) => {
+            const adCount = userState.lifetimeAdCount || 0;
+            const achievementsToUnlock = userAchievements.filter(achievement => 
+                !achievement.unlocked && adCount >= achievement.requirement
+            );
+            
+            for (const achievement of achievementsToUnlock) {
+                // Unlock achievement
+                await db.ref(`users/${tgUser.id}/achievements/${achievement.id}`).set(true);
+                
+                // Add reward to balance
+                await db.ref(`users/${tgUser.id}/balance`).set(
+                    firebase.database.ServerValue.increment(achievement.reward)
+                );
+                
+                userState.balance += achievement.reward;
+                achievement.unlocked = true;
+                
+                // Show achievement unlocked popup
+                showPopup(`
+                    <h2>Achievement Unlocked! 🏆</h2>
+                    <p>${achievement.name}</p>
+                    <p>+${achievement.reward} ${appConfig.currency || 'TK'} added to your balance!</p>
+                    <button class="popup-close-btn">Awesome!</button>
+                `);
+            }
+        };
+        
         const setupNavigation = () => {
             // Page navigation
             const navButtons = document.querySelectorAll('.nav-btn'); 
@@ -1069,17 +1644,12 @@
                 button.addEventListener('click', () => {
                     const pageId = button.dataset.page;
                     
-                    // Hide all pages
                     pages.forEach(page => page.classList.remove('active'));
-                    
-                    // Show selected page
                     document.getElementById(pageId).classList.add('active');
                     
-                    // Update active nav button
                     navButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
                     
-                    // Page-specific actions
                     if (pageId === 'profile-page') { 
                         renderWithdrawalHistory(); 
                         renderAdHistory();
@@ -1100,11 +1670,9 @@
                 tab.addEventListener('click', () => {
                     const historyType = tab.dataset.history;
                     
-                    // Update active tab
                     historyTabs.forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     
-                    // Show corresponding section
                     historySections.forEach(section => {
                         section.classList.remove('active');
                         if (section.id === `${historyType}-history-section`) {
@@ -1112,9 +1680,33 @@
                         }
                     });
                     
-                    // Mark messages as read when viewing messages tab
                     if (historyType === 'messages') {
                         markMessagesAsRead();
+                    }
+                });
+            });
+            
+            // Quick actions
+            document.querySelectorAll('.quick-action').forEach(action => {
+                action.addEventListener('click', () => {
+                    const actionType = action.dataset.action;
+                    
+                    switch(actionType) {
+                        case 'watch-ad':
+                            handleWatchAd();
+                            break;
+                        case 'referral':
+                            document.querySelector('.nav-btn[data-page="profile-page"]').click();
+                            break;
+                        case 'withdraw':
+                            document.querySelector('.nav-btn[data-page="profile-page"]').click();
+                            setTimeout(() => {
+                                document.querySelector('.history-tab[data-history="withdrawal"]').click();
+                            }, 100);
+                            break;
+                        case 'tasks':
+                            document.querySelector('.nav-btn[data-page="tasks-page"]').click();
+                            break;
                     }
                 });
             });
@@ -1172,7 +1764,6 @@
             document.getElementById('dark-mode-toggle')?.addEventListener('change', (e) => {
                 const db = firebase.database();
                 db.ref(`users/${tgUser.id}/settings/darkMode`).set(e.target.checked);
-                
                 document.body.className = e.target.checked ? 'dark-theme' : 'light-theme';
             });
             
@@ -1207,6 +1798,53 @@
                 }
             });
             
+            // Daily bonus
+            document.getElementById('daily-bonus-btn')?.addEventListener('click', async () => {
+                const db = firebase.database();
+                const bonusAmount = 10;
+                
+                await db.ref(`users/${tgUser.id}/balance`).set(
+                    firebase.database.ServerValue.increment(bonusAmount)
+                );
+                
+                userState.balance += bonusAmount;
+                
+                // Update last bonus date
+                const today = new Date().toISOString().slice(0, 10);
+                localStorage.setItem(`lastBonusDate_${tgUser.id}`, today);
+                
+                document.getElementById('daily-bonus-btn').disabled = true;
+                document.getElementById('daily-bonus-btn').textContent = 'Already Claimed Today';
+                
+                tg.showAlert(`Daily bonus of ${bonusAmount} ${appConfig.currency || 'TK'} claimed!`);
+                renderUI();
+            });
+            
+            // VIP upgrade
+            document.getElementById('vip-upgrade-btn')?.addEventListener('click', async () => {
+                if (userState.balance < 500) {
+                    tg.showAlert(`You need 500 ${appConfig.currency || 'TK'} to upgrade to VIP.`);
+                    return;
+                }
+                
+                const db = firebase.database();
+                const vipExpiry = new Date();
+                vipExpiry.setMonth(vipExpiry.getMonth() + 1);
+                
+                await db.ref(`users/${tgUser.id}`).update({
+                    balance: firebase.database.ServerValue.increment(-500),
+                    isVIP: true,
+                    vipExpiry: vipExpiry.getTime()
+                });
+                
+                userState.balance -= 500;
+                userState.isVIP = true;
+                userState.vipExpiry = vipExpiry.getTime();
+                
+                tg.showAlert('Congratulations! You are now a VIP member for 1 month!');
+                renderUI();
+            });
+            
             // Chat functionality
             document.getElementById('chat-send-btn')?.addEventListener('click', sendChatMessage);
             document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
@@ -1229,6 +1867,13 @@
                 renderMessages();
                 
                 tg.showAlert("Data refreshed successfully!");
+            });
+            
+            // Logout
+            document.getElementById('logout-btn')?.addEventListener('click', () => {
+                if (confirm("Are you sure you want to logout?")) {
+                    tg.close();
+                }
             });
         };
 
@@ -1275,8 +1920,13 @@
             const now = Date.now();
             const onBreak = userState.breakUntil && now < userState.breakUntil;
             const limitReached = userState.dailyAdCount >= (appConfig.dailyAdLimit || 10);
-            const adValue = appConfig.adValue || 5;
+            let adValue = appConfig.adValue || 5;
             const currency = appConfig.currency || 'TK';
+            
+            // VIP users get 2x rewards
+            if (userState.isVIP) {
+                adValue *= 2;
+            }
             
             let html = '';
             if (onBreak) {
@@ -1308,7 +1958,7 @@
                         <img class="task-icon-img" src="https://img.icons8.com/ios-filled/100/play-button-circled.png" alt="icon">
                         <div class="task-info">
                             <h3>Watch a Rewarded Ad</h3>
-                            <p>Earn ${adValue} ${currency} for every ad.</p>
+                            <p>Earn ${adValue} ${currency} for every ad. ${userState.isVIP ? '(VIP 2x Bonus!)' : ''}</p>
                         </div>
                         <button id="watch-ad-btn" class="action-btn">Watch Ad</button>
                     </div>
@@ -1536,7 +2186,7 @@
                     item.className = 'leaderboard-item';
                     item.innerHTML = `
                         <span class="rank">#${index + 1}</span>
-                        <img src="${user.photoUrl || 'https://via.placeholder.com/40'}" alt="User" onerror="this.src='https://via.placeholder.com/40'">
+                        <img src="${user.photoUrl || 'https://via.placeholder.com/45'}" alt="User" onerror="this.src='https://via.placeholder.com/45'">
                         <span class="leaderboard-name">${user.firstName || 'User'}</span>
                         <span class="leaderboard-score">${score}</span>
                     `;
@@ -1591,7 +2241,7 @@
                     <h3>Refer & Earn More!</h3>
                     <p>Invite friends and earn ${referralBonus} ${currency} per referral.</p>
                     <input type="text" id="referral-link" value="${refLink}" readonly 
-                           style="padding: 10px; text-align: center; border-radius: 8px; border: 1px dashed var(--primary-color); margin: 10px 0; background: transparent;">
+                           style="padding: 12px; text-align: center; border-radius: 10px; border: 2px dashed var(--primary-color); margin: 15px 0; background: transparent; font-weight: 600;">
                     <button id="copy-ref-link-btn" class="action-btn">Copy Link</button>
                 </div>
             `;
@@ -1613,7 +2263,7 @@
             let referralNotice = '';
             if (minRefs > 0) {
                 referralNotice = `
-                    <p style="font-size: 0.85rem; text-align: center; margin-bottom: 15px; opacity: 0.8;">
+                    <p style="font-size: 0.9rem; text-align: center; margin-bottom: 20px; opacity: 0.8; padding: 10px; border-radius: 10px; background: rgba(231, 76, 60, 0.1);">
                         <b>Note:</b> You need at least <b>${minRefs} referrals</b> to be eligible for withdrawal.
                     </p>
                 `;
@@ -1623,20 +2273,20 @@
                 <form id="withdraw-form" class="task-container" style="flex-direction: column; align-items: stretch;">
                     <h3>Request Withdrawal</h3>
                     ${referralNotice}
-                    <div class="form-group" style="width:100%; margin-bottom: 15px;">
-                        <label for="withdraw-method" style="display: block; margin-bottom: 5px; font-weight: 500;">Method:</label>
-                        <select id="withdraw-method" required style="width: 100%; padding: 10px; border-radius: 8px;">
+                    <div class="form-group" style="width:100%; margin-bottom: 20px;">
+                        <label for="withdraw-method" style="display: block; margin-bottom: 8px; font-weight: 600;">Method:</label>
+                        <select id="withdraw-method" required style="width: 100%; padding: 12px 15px; border-radius: 10px;">
                             ${optionsHtml}
                         </select>
                     </div>
-                    <div class="form-group" style="width:100%; margin-bottom: 15px;">
-                        <label for="account-number" style="display: block; margin-bottom: 5px; font-weight: 500;">Account Number/ID:</label>
-                        <input type="text" id="account-number" required style="width: 100%; padding: 10px; border-radius: 8px;">
+                    <div class="form-group" style="width:100%; margin-bottom: 20px;">
+                        <label for="account-number" style="display: block; margin-bottom: 8px; font-weight: 600;">Account Number/ID:</label>
+                        <input type="text" id="account-number" required style="width: 100%; padding: 12px 15px; border-radius: 10px;">
                     </div>
-                    <div class="form-group" style="width:100%; margin-bottom: 15px;">
-                        <label for="amount" style="display: block; margin-bottom: 5px; font-weight: 500;">Amount:</label>
+                    <div class="form-group" style="width:100%; margin-bottom: 20px;">
+                        <label for="amount" style="display: block; margin-bottom: 8px; font-weight: 600;">Amount:</label>
                         <input type="number" step="any" id="amount" required 
-                               placeholder="Enter amount" style="width: 100%; padding: 10px; border-radius: 8px;">
+                               placeholder="Enter amount" style="width: 100%; padding: 12px 15px; border-radius: 10px;">
                     </div>
                     <button type="submit" id="withdraw-submit-btn" class="action-btn">Submit Request</button>
                 </form>
